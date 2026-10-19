@@ -2,266 +2,105 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Micro:bit Car Controller</title>
-    <!-- Google Fonts for modern typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="화면 터치와 키보드로 함께 사용하는 마이크로비트 자동차 조종기. HTML 파일을 내려받으면 인터넷 없이 사용할 수 있습니다.">
+    <title>마이크로비트 자동차 조종기</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
-        <header>
+        <header class="app-header">
             <div class="logo">
-                <i class="fa-solid fa-microchip"></i>
-                <h1>M:BIT CONTROL</h1>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="3"/><path d="M9 1v4m6-4v4M9 19v4m6-4v4M1 9h4m-4 6h4m14-6h4m-4 6h4"/><path d="M9 10h.01M15 10h.01M9 14h6"/></svg>
+                <div><h1>M:BIT CONTROL</h1><p>마이크로비트 자동차 조종기</p></div>
             </div>
-            <div class="controls-top">
-                <button id="btn-connect" class="connect-btn">
-                    <i class="fa-brands fa-bluetooth-b"></i> <span>Connect</span>
-                </button>
-            </div>
+            <button type="button" id="btn-connect" class="connect-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10-5 4V3l5 4L7 17"/></svg><span>블루투스 연결</span></button>
         </header>
 
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <div class="status-indicator" id="status-indicator"></div>
-            <span id="status-text">Disconnected</span>
+        <div class="status-row">
+            <div class="status-bar" role="status" aria-live="polite"><span class="status-indicator" id="status-indicator" aria-hidden="true"></span><span id="status-text">연결되지 않음</span></div>
+            <span class="mode-note">터치 + 키보드</span>
         </div>
 
-        <!-- Main Controller Area -->
-        <main class="controller-area">
-            <!-- D-Pad (Left Side) -->
-            <div class="d-pad">
-                <div class="d-row">
-                    <button class="ctrl-btn d-btn up" data-action="up">
-                        <i class="fa-solid fa-caret-up"></i>
-                    </button>
+        <main>
+            <p class="intro">누르고 있는 동안 이동, <strong>손을 떼면 정지</strong></p>
+            <div class="controller-area" aria-label="자동차 조종 패드">
+                <div class="d-pad" role="group" aria-label="방향 조종">
+                    <div class="d-row"><button type="button" class="ctrl-btn d-btn up" data-action="up" aria-label="앞으로 (위쪽 방향키)" aria-pressed="false" title="위쪽 방향키: 앞으로"><span class="arrow" aria-hidden="true">↑</span><span class="button-label">앞으로</span></button></div>
+                    <div class="d-row"><button type="button" class="ctrl-btn d-btn left" data-action="left" aria-label="왼쪽 (왼쪽 방향키)" aria-pressed="false" title="왼쪽 방향키: 왼쪽"><span class="arrow" aria-hidden="true">←</span><span class="button-label">왼쪽</span></button><div class="d-center" aria-hidden="true">✚</div><button type="button" class="ctrl-btn d-btn right" data-action="right" aria-label="오른쪽 (오른쪽 방향키)" aria-pressed="false" title="오른쪽 방향키: 오른쪽"><span class="arrow" aria-hidden="true">→</span><span class="button-label">오른쪽</span></button></div>
+                    <div class="d-row"><button type="button" class="ctrl-btn d-btn down" data-action="down" aria-label="뒤로 (아래쪽 방향키)" aria-pressed="false" title="아래쪽 방향키: 뒤로"><span class="arrow" aria-hidden="true">↓</span><span class="button-label">뒤로</span></button></div>
                 </div>
-                <div class="d-row">
-                    <button class="ctrl-btn d-btn left" data-action="left">
-                        <i class="fa-solid fa-caret-left"></i>
-                    </button>
-                    <div class="d-center"></div>
-                    <button class="ctrl-btn d-btn right" data-action="right">
-                        <i class="fa-solid fa-caret-right"></i>
-                    </button>
+                <div class="center-buttons">
+                    <button type="button" id="btn-stop" class="stop-btn" data-action="stop" aria-label="즉시 정지 (스페이스 또는 Esc 키)" title="스페이스 또는 Esc: 정지"><span class="stop-square" aria-hidden="true"></span><strong>정지</strong><small>SPACE / ESC</small></button>
+                    <div class="settings-buttons">
+                        <button type="button" id="btn-option" class="start-btn" aria-label="모터 조정 열기" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg><span>모터 조정</span></button>
+                        <button type="button" id="btn-settings" class="start-btn" aria-label="명령 설정 열기" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-14-2 16"/></svg><span>명령 설정</span></button>
+                    </div>
                 </div>
-                <div class="d-row">
-                    <button class="ctrl-btn d-btn down" data-action="down">
-                        <i class="fa-solid fa-caret-down"></i>
-                    </button>
+                <div class="action-buttons" role="group" aria-label="추가 동작">
+                    <div class="action-row"><button type="button" class="ctrl-btn action-btn btn-c" data-action="c" aria-label="C 버튼 (C 키)" aria-pressed="false" title="키보드 C"><span>C</span></button><button type="button" class="ctrl-btn action-btn btn-d" data-action="d" aria-label="D 버튼 (D 키)" aria-pressed="false" title="키보드 D"><span>D</span></button></div>
+                    <div class="action-row"><button type="button" class="ctrl-btn action-btn btn-a" data-action="a" aria-label="A 버튼 (A 키)" aria-pressed="false" title="키보드 A"><span>A</span></button><button type="button" class="ctrl-btn action-btn btn-b" data-action="b" aria-label="B 버튼 (B 키)" aria-pressed="false" title="키보드 B"><span>B</span></button></div>
+                    <span class="action-caption">키보드 A · B · C · D</span>
                 </div>
             </div>
-
-            <!-- Center Buttons (Start/Settings) -->
-            <div class="center-buttons">
-                <button id="btn-option" class="start-btn" aria-label="Option">
-                    <i class="fa-solid fa-sliders"></i>
-                </button>
-                <button id="btn-settings" class="start-btn" aria-label="Settings">
-                    <i class="fa-solid fa-gear"></i>
-                </button>
-            </div>
-
-            <!-- Action Buttons (Right Side) -->
-            <div class="action-buttons">
-                <!-- 2x2 Grid Layout -->
-                <div class="action-row">
-                    <button class="ctrl-btn action-btn btn-c" data-action="c">
-                        <span>C</span>
-                    </button>
-                    <button class="ctrl-btn action-btn btn-d" data-action="d">
-                        <span>D</span>
-                    </button>
-                </div>
-                <div class="action-row">
-                    <button class="ctrl-btn action-btn btn-a" data-action="a">
-                        <span>A</span>
-                    </button>
-                    <button class="ctrl-btn action-btn btn-b" data-action="b">
-                        <span>B</span>
-                    </button>
-                </div>
-            </div>
+            <div class="input-state"><span class="input-state-label">현재 조종</span><span id="input-status" role="status" aria-live="polite">정지 · 키나 버튼을 누르면 움직여요</span></div>
+            <div class="keyboard-guide" aria-label="키보드 사용법"><span><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 화면과 같은 방향</span><span><kbd>A</kbd>–<kbd>D</kbd> 추가 동작</span><span><kbd>Space</kbd> / <kbd>Esc</kbd> 정지</span></div>
         </main>
+
+        <footer class="offline-panel">
+            <div><strong>인터넷 없는 교실에서도</strong><p>파일을 저장한 뒤 Chrome으로 열고 블루투스를 연결하세요.</p></div>
+            <a id="btn-download" class="download-btn" href="./microbit-controller-offline.html" download="microbit-controller-offline.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg><span>오프라인 HTML 저장</span></a>
+            <p id="offline-note" class="offline-note" hidden>오프라인 파일 · 인터넷 없이 사용 가능</p>
+        </footer>
+        <p class="platform-note">크롬북·PC·안드로이드의 Chrome에서 사용하세요. 연결 버튼을 누르면 기기를 선택할 수 있어요.</p>
+        <noscript><p class="no-script">조종기를 사용하려면 브라우저에서 JavaScript를 허용해 주세요.</p></noscript>
     </div>
 
-    <!-- Real-time Tuning Modal -->
-    <div class="modal" id="tuning-modal">
-        <div class="tuning-panel" style="margin: 0; max-width: 650px; width: 95%; background: var(--bg-color); max-height: 90vh; display: flex; flex-direction: column;">
-            <div class="tuning-header" style="flex-shrink: 0;">
-                <h3><i class="fa-solid fa-sliders"></i> Motor Tuning</h3>
-                <button class="close-btn" id="btn-close-tuning"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="tuning-body" style="overflow-y: auto;">
-                <p class="tuning-desc">0~180 사이의 값을 조절하여 직진/회전 시 바퀴의 회전 속도와 방향을 실시간으로 맞출 수 있습니다. (90=정지)</p>
+    <div class="modal" id="tuning-modal" role="dialog" aria-modal="true" aria-labelledby="tuning-title" tabindex="-1" hidden>
+        <div class="tuning-panel">
+            <div class="tuning-header"><h2 id="tuning-title">모터 조정</h2><button type="button" class="close-btn" id="btn-close-tuning" aria-label="모터 조정 닫기">×</button></div>
+            <div class="tuning-body">
+                <p class="tuning-desc">0~180 사이에서 바퀴의 회전 속도와 방향을 맞춰요. <strong>정지 위치는 90 근처</strong>이며 모터에 따라 보정이 필요합니다. 연결 중에는 변경한 값이 바로 전송됩니다.</p>
                 <div class="tuning-grid">
-                    <div class="slider-group">
-                        <label>직진 시 P0 (왼쪽)</label>
-                        <div class="slider-wrapper">
-                            <span class="dir-label">뒤로</span>
-                            <input type="range" class="motor-slider" id="var_f_p0" data-var="F_P0" min="0" max="180" value="180">
-                            <span class="dir-label">앞으로</span>
-                            <span class="slider-val" id="val_f_p0">180</span>
-                        </div>
-                    </div>
-                    <div class="slider-group">
-                        <label>직진 시 P1 (오른쪽)</label>
-                        <div class="slider-wrapper">
-                            <span class="dir-label">앞으로</span>
-                            <input type="range" class="motor-slider" id="var_f_p1" data-var="F_P1" min="0" max="180" value="0">
-                            <span class="dir-label">뒤로</span>
-                            <span class="slider-val" id="val_f_p1">0</span>
-                        </div>
-                    </div>
-                    <div class="slider-group">
-                        <label>후진 시 P0</label>
-                        <div class="slider-wrapper">
-                            <span class="dir-label">뒤로</span>
-                            <input type="range" class="motor-slider" id="var_b_p0" data-var="B_P0" min="0" max="180" value="0">
-                            <span class="dir-label">앞으로</span>
-                            <span class="slider-val" id="val_b_p0">0</span>
-                        </div>
-                    </div>
-                    <div class="slider-group">
-                        <label>후진 시 P1</label>
-                        <div class="slider-wrapper">
-                            <span class="dir-label">앞으로</span>
-                            <input type="range" class="motor-slider" id="var_b_p1" data-var="B_P1" min="0" max="180" value="180">
-                            <span class="dir-label">뒤로</span>
-                            <span class="slider-val" id="val_b_p1">180</span>
-                        </div>
-                    </div>
-                    <div class="slider-group">
-                        <label>좌회전 시 P0</label>
-                        <div class="slider-wrapper">
-                            <span class="dir-label">뒤로</span>
-                            <input type="range" class="motor-slider" id="var_l_p0" data-var="L_P0" min="0" max="180" value="0">
-                            <span class="dir-label">앞으로</span>
-                            <span class="slider-val" id="val_l_p0">0</span>
-                        </div>
-                    </div>
-                    <div class="slider-group">
-                        <label>좌회전 시 P1</label>
-                        <div class="slider-wrapper">
-                            <span class="dir-label">앞으로</span>
-                            <input type="range" class="motor-slider" id="var_l_p1" data-var="L_P1" min="0" max="180" value="0">
-                            <span class="dir-label">뒤로</span>
-                            <span class="slider-val" id="val_l_p1">0</span>
-                        </div>
-                    </div>
-                    <div class="slider-group">
-                        <label>우회전 시 P0</label>
-                        <div class="slider-wrapper">
-                            <span class="dir-label">뒤로</span>
-                            <input type="range" class="motor-slider" id="var_r_p0" data-var="R_P0" min="0" max="180" value="180">
-                            <span class="dir-label">앞으로</span>
-                            <span class="slider-val" id="val_r_p0">180</span>
-                        </div>
-                    </div>
-                    <div class="slider-group">
-                        <label>우회전 시 P1</label>
-                        <div class="slider-wrapper">
-                            <span class="dir-label">앞으로</span>
-                            <input type="range" class="motor-slider" id="var_r_p1" data-var="R_P1" min="0" max="180" value="180">
-                            <span class="dir-label">뒤로</span>
-                            <span class="slider-val" id="val_r_p1">180</span>
-                        </div>
-                    </div>
-                    <!-- P2 Extension -->
-                    <div class="slider-group" style="margin-top: 10px;">
-                        <label>A 버튼 (P2 모터)</label>
-                        <div class="slider-wrapper">
-                            <input type="range" class="motor-slider" id="var_a_p2" data-var="A_P2" min="0" max="180" value="180">
-                            <span class="slider-val" id="val_a_p2">180</span>
-                        </div>
-                    </div>
-                    <div class="slider-group" style="margin-top: 10px;">
-                        <label>B 버튼 (P2 모터)</label>
-                        <div class="slider-wrapper">
-                            <input type="range" class="motor-slider" id="var_b_p2" data-var="B_P2" min="0" max="180" value="0">
-                            <span class="slider-val" id="val_b_p2">0</span>
-                        </div>
-                    </div>
-                    <div class="slider-group">
-                        <label>C 버튼 (P2 모터)</label>
-                        <div class="slider-wrapper">
-                            <input type="range" class="motor-slider" id="var_c_p2" data-var="C_P2" min="0" max="180" value="90">
-                            <span class="slider-val" id="val_c_p2">90</span>
-                        </div>
-                    </div>
-                    <div class="slider-group">
-                        <label>D 버튼 (P2 모터)</label>
-                        <div class="slider-wrapper">
-                            <input type="range" class="motor-slider" id="var_d_p2" data-var="D_P2" min="0" max="180" value="90">
-                            <span class="slider-val" id="val_d_p2">90</span>
-                        </div>
-                    </div>
+                    <div class="slider-group"><label for="var_f_p0">직진 P0 · 왼쪽</label><div class="slider-wrapper"><span class="dir-label">뒤로</span><input type="range" class="motor-slider" id="var_f_p0" data-var="F_P0" min="0" max="180" value="180"><span class="dir-label">앞으로</span><span class="slider-val" id="val_f_p0">180</span></div></div>
+                    <div class="slider-group"><label for="var_f_p1">직진 P1 · 오른쪽</label><div class="slider-wrapper"><span class="dir-label">앞으로</span><input type="range" class="motor-slider" id="var_f_p1" data-var="F_P1" min="0" max="180" value="0"><span class="dir-label">뒤로</span><span class="slider-val" id="val_f_p1">0</span></div></div>
+                    <div class="slider-group"><label for="var_b_p0">후진 P0 · 왼쪽</label><div class="slider-wrapper"><span class="dir-label">뒤로</span><input type="range" class="motor-slider" id="var_b_p0" data-var="B_P0" min="0" max="180" value="0"><span class="dir-label">앞으로</span><span class="slider-val" id="val_b_p0">0</span></div></div>
+                    <div class="slider-group"><label for="var_b_p1">후진 P1 · 오른쪽</label><div class="slider-wrapper"><span class="dir-label">앞으로</span><input type="range" class="motor-slider" id="var_b_p1" data-var="B_P1" min="0" max="180" value="180"><span class="dir-label">뒤로</span><span class="slider-val" id="val_b_p1">180</span></div></div>
+                    <div class="slider-group"><label for="var_l_p0">좌회전 P0 · 왼쪽</label><div class="slider-wrapper"><span class="dir-label">뒤로</span><input type="range" class="motor-slider" id="var_l_p0" data-var="L_P0" min="0" max="180" value="0"><span class="dir-label">앞으로</span><span class="slider-val" id="val_l_p0">0</span></div></div>
+                    <div class="slider-group"><label for="var_l_p1">좌회전 P1 · 오른쪽</label><div class="slider-wrapper"><span class="dir-label">앞으로</span><input type="range" class="motor-slider" id="var_l_p1" data-var="L_P1" min="0" max="180" value="0"><span class="dir-label">뒤로</span><span class="slider-val" id="val_l_p1">0</span></div></div>
+                    <div class="slider-group"><label for="var_r_p0">우회전 P0 · 왼쪽</label><div class="slider-wrapper"><span class="dir-label">뒤로</span><input type="range" class="motor-slider" id="var_r_p0" data-var="R_P0" min="0" max="180" value="180"><span class="dir-label">앞으로</span><span class="slider-val" id="val_r_p0">180</span></div></div>
+                    <div class="slider-group"><label for="var_r_p1">우회전 P1 · 오른쪽</label><div class="slider-wrapper"><span class="dir-label">앞으로</span><input type="range" class="motor-slider" id="var_r_p1" data-var="R_P1" min="0" max="180" value="180"><span class="dir-label">뒤로</span><span class="slider-val" id="val_r_p1">180</span></div></div>
+                    <div class="slider-group"><label for="var_a_p2">A 버튼 · P2 모터</label><div class="slider-wrapper"><span class="dir-label">0</span><input type="range" class="motor-slider" id="var_a_p2" data-var="A_P2" min="0" max="180" value="180"><span class="dir-label">180</span><span class="slider-val" id="val_a_p2">180</span></div></div>
+                    <div class="slider-group"><label for="var_b_p2">B 버튼 · P2 모터</label><div class="slider-wrapper"><span class="dir-label">0</span><input type="range" class="motor-slider" id="var_b_p2" data-var="B_P2" min="0" max="180" value="0"><span class="dir-label">180</span><span class="slider-val" id="val_b_p2">0</span></div></div>
+                    <div class="slider-group"><label for="var_c_p2">C 버튼 · P2 모터</label><div class="slider-wrapper"><span class="dir-label">0</span><input type="range" class="motor-slider" id="var_c_p2" data-var="C_P2" min="0" max="180" value="90"><span class="dir-label">180</span><span class="slider-val" id="val_c_p2">90</span></div></div>
+                    <div class="slider-group"><label for="var_d_p2">D 버튼 · P2 모터</label><div class="slider-wrapper"><span class="dir-label">0</span><input type="range" class="motor-slider" id="var_d_p2" data-var="D_P2" min="0" max="180" value="90"><span class="dir-label">180</span><span class="slider-val" id="val_d_p2">90</span></div></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="modal">
+    <div id="settings-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="settings-title" tabindex="-1" hidden>
         <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fa-solid fa-sliders"></i> Command Settings</h2>
-                <button id="btn-close-modal" class="icon-btn"><i class="fa-solid fa-xmark"></i></button>
-            </div>
+            <div class="modal-header"><h2 id="settings-title">명령 설정</h2><button type="button" id="btn-close-modal" class="icon-btn" aria-label="명령 설정 닫기">×</button></div>
             <div class="modal-body">
-                <p class="settings-desc">버튼을 눌렀을 때 마이크로비트로 전송될 문자(명령)를 설정하세요.</p>
-                
+                <p class="settings-desc">화면 버튼과 키보드 모두 아래의 명령을 보냅니다. 마이크로비트 프로그램의 명령과 같게 설정하세요.</p>
                 <div class="settings-grid">
-                    <div class="input-group">
-                        <label for="cmd-up"><i class="fa-solid fa-arrow-up"></i> 직진 (Up)</label>
-                        <input type="text" id="cmd-up" maxlength="5">
-                    </div>
-                    <div class="input-group">
-                        <label for="cmd-down"><i class="fa-solid fa-arrow-down"></i> 후진 (Down)</label>
-                        <input type="text" id="cmd-down" maxlength="5">
-                    </div>
-                    <div class="input-group">
-                        <label for="cmd-left"><i class="fa-solid fa-arrow-left"></i> 좌회전 (Left)</label>
-                        <input type="text" id="cmd-left" maxlength="5">
-                    </div>
-                    <div class="input-group">
-                        <label for="cmd-right"><i class="fa-solid fa-arrow-right"></i> 우회전 (Right)</label>
-                        <input type="text" id="cmd-right" maxlength="5">
-                    </div>
-                    <div class="input-group">
-                        <label for="cmd-a">A 버튼</label>
-                        <input type="text" id="cmd-a" maxlength="5">
-                    </div>
-                    <div class="input-group">
-                        <label for="cmd-b">B 버튼</label>
-                        <input type="text" id="cmd-b" maxlength="5">
-                    </div>
-                    <div class="input-group">
-                        <label for="cmd-c">C 버튼</label>
-                        <input type="text" id="cmd-c" maxlength="5">
-                    </div>
-                    <div class="input-group">
-                        <label for="cmd-d">D 버튼</label>
-                        <input type="text" id="cmd-d" maxlength="5">
-                    </div>
-                    <div class="input-group full-width">
-                        <label for="cmd-stop"><i class="fa-solid fa-hand"></i> 정지 (버튼 뗐을 때)</label>
-                        <input type="text" id="cmd-stop" maxlength="5">
-                    </div>
+                    <div class="input-group"><label for="cmd-up">↑ 직진</label><input type="text" id="cmd-up" maxlength="5" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+                    <div class="input-group"><label for="cmd-down">↓ 후진</label><input type="text" id="cmd-down" maxlength="5" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+                    <div class="input-group"><label for="cmd-left">← 좌회전</label><input type="text" id="cmd-left" maxlength="5" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+                    <div class="input-group"><label for="cmd-right">→ 우회전</label><input type="text" id="cmd-right" maxlength="5" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+                    <div class="input-group"><label for="cmd-a">A 버튼</label><input type="text" id="cmd-a" maxlength="5" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+                    <div class="input-group"><label for="cmd-b">B 버튼</label><input type="text" id="cmd-b" maxlength="5" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+                    <div class="input-group"><label for="cmd-c">C 버튼</label><input type="text" id="cmd-c" maxlength="5" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+                    <div class="input-group"><label for="cmd-d">D 버튼</label><input type="text" id="cmd-d" maxlength="5" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+                    <div class="input-group full-width"><label for="cmd-stop">정지 · 버튼이나 키를 뗐을 때</label><input type="text" id="cmd-stop" maxlength="5" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
                 </div>
-                
-                <button id="btn-save-settings" class="primary-btn">Save Settings</button>
+                <button type="button" id="btn-save-settings" class="primary-btn">설정 저장</button>
             </div>
         </div>
     </div>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast">Settings Saved!</div>
-
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <script src="app.js"></script>
 </body>
 </html>
