@@ -13,4 +13,3 @@ jobs:
         with:
           node-version: 20
       - run: node --test tests/emergency-stop.test.js
-
