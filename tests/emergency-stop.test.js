@@ -248,4 +248,3 @@ test('a timed-out GATT write disconnects instead of overlapping an uncertain STO
     assert.deepEqual(controller.writes, ['STOP', 'UP']);
     assert.equal(controller.device.gatt.connected, false);
 });
-
